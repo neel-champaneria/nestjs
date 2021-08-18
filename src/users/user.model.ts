@@ -5,8 +5,16 @@ import {
   Table,
   Model,
   DeletedAt,
+  BelongsToMany,
+  HasMany,
 } from 'sequelize-typescript';
+import { Group } from '../groups/group.model';
 import { Base } from './../Base.model';
+import { Friend } from './../friends/friend.model';
+import { UserGroupMapping } from './../user-group-mapping/user-group-mapping.model';
+import { Expense } from '../expenses/expense.model';
+import { Repayment } from './../repayments/repayment.model';
+import { Activity } from './../activities/activity.model';
 
 @Table
 export class User extends Base {
@@ -36,6 +44,25 @@ export class User extends Base {
   @Column({
     type: DataType.BOOLEAN,
     defaultValue: false,
+    allowNull: false,
   })
   isRegistered: boolean;
+
+  @BelongsToMany(() => User, () => Friend, 'user')
+  user: User[];
+
+  @BelongsToMany(() => User, () => Friend, 'friend')
+  friend: User[];
+
+  @BelongsToMany(() => Group, () => UserGroupMapping, 'userId')
+  groups: Group[];
+
+  @HasMany(() => Expense, { foreignKey: 'userId', onDelete: 'CASCADE' })
+  expenses: Expense[];
+
+  @HasMany(() => Repayment, { foreignKey: 'userId', onDelete: 'CASCADE' })
+  repayments: Repayment[];
+
+  @HasMany(() => Activity, { foreignKey: 'userId', onDelete: 'CASCADE' })
+  activities: Activity[];
 }
